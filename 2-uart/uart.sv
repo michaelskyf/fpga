@@ -116,6 +116,7 @@ begin
     end
 end
 
-assign led = txComplete;
+assign led[0] = txComplete;
+assign led[5:1] = 5'b11111;
 
 endmodule
