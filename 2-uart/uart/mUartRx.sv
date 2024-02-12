@@ -22,8 +22,6 @@ reg [31:0] clkCounter = 0;
 reg [3:0] dataCounter = 0;
 eRxState rxState = RX_STATE_IDLE;
 
-assign dataOut = buffer;
-
 always_ff @( posedge clk )
 begin
 
@@ -47,6 +45,7 @@ begin
                 dataOut <= {uart_rx, dataOut[7:1]};
             end else if(uart_rx == 1) begin
                 complete <= 1;
+                dataCounter <= 0;
                 rxState <= RX_STATE_IDLE;
             end
         end

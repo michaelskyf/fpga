@@ -5,7 +5,7 @@ module mUartTx
 )
 (
     input wire clock,
-    output reg uart_tx,
+    output reg uart_tx = 1,
 
     output reg complete = 1,
     input wire send,
