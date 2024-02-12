@@ -15,7 +15,6 @@ localparam BAUD_RATE = 115200;
 reg [7:0] tx = "!";
 wire [7:0] rx;
 wire complete;
-wire reset;
 wire dummy;
 
 mUartTx #(CLK_SPEED, BAUD_RATE) uartTx(clk, uart_tx, dummy, complete, rx);

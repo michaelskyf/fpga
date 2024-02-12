@@ -32,9 +32,10 @@ task handleTx();
     begin
         case(txState)
             TX_STATE_IDLE: if(shouldSend) begin // Start bit
-                shouldSend <= 0;
                 uart_tx <= 0;
                 complete <= 0;
+                shouldSend <= 0;
+                txBuf <= dataIn;
                 txState <= TX_STATE_DATA;
             end
             TX_STATE_DATA: begin // Data
@@ -43,13 +44,13 @@ task handleTx();
                     uart_tx <= txBuf[txCounter];
                 end else begin
                     txState <= TX_STATE_END;
+                    uart_tx <= 1;
+                    complete <= 1;
+                    txCounter <= 0;
                 end
             end
             TX_STATE_END: begin // Stop bit
-                uart_tx <= 1;
-                complete <= 1;
                 txState <= TX_STATE_IDLE;
-                txCounter <= 0;
             end
         endcase
     end
@@ -58,15 +59,11 @@ endtask
 
 always_ff @( posedge clock )
 begin
-
-    if(complete && send)
-    begin
+    if(send) begin
         shouldSend <= 1;
-        txBuf <= dataIn;
     end
-
     clockCounter <= clockCounter + 1;
-    if(clockCounter == CLOCK_DELAY)
+    if(clockCounter == CLOCK_DELAY || txState == TX_STATE_IDLE)
     begin
         clockCounter <= 0;
 
