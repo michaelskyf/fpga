@@ -25,6 +25,7 @@ reg [31:0] clockCounter;
 eTxState txState = TX_STATE_IDLE;
 reg [7:0] txCounter;
 
+reg [7:0] inputBuf;
 reg [7:0] txBuf;
 reg shouldSend = 0;
 
@@ -35,7 +36,7 @@ task handleTx();
                 uart_tx <= 0;
                 complete <= 0;
                 shouldSend <= 0;
-                txBuf <= dataIn;
+                txBuf <= inputBuf;
                 txState <= TX_STATE_DATA;
             end
             TX_STATE_DATA: begin // Data
@@ -61,6 +62,7 @@ always_ff @( posedge clock )
 begin
     if(send) begin
         shouldSend <= 1;
+        inputBuf <= dataIn;
     end
     clockCounter <= clockCounter + 1;
     if(clockCounter == CLOCK_DELAY || txState == TX_STATE_IDLE)
