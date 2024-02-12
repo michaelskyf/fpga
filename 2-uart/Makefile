@@ -2,23 +2,23 @@ BOARD=tangnano9k
 FAMILY=GW1N-9C
 DEVICE=GW1NR-LV9QN88PC6/I5
 
-all: uart.fs
+all: top.fs
 
 # Synthesis
-uart.json: uart.sv
-	yosys -p "read_verilog -sv uart.sv; synth_gowin -top top -json uart.json"
+top.json: top.sv
+	yosys -p "read_verilog -sv top.sv; synth_gowin -top top -json top.json"
 
 # Place and Route
-uart_pnr.json: uart.json
-	nextpnr-gowin --force --top top --json uart.json --freq 27 --write uart_pnr.json --device ${DEVICE} --family ${FAMILY} --cst ${BOARD}.cst
+top_pnr.json: top.json
+	nextpnr-gowin --force --top top --json top.json --freq 27 --write top_pnr.json --device ${DEVICE} --family ${FAMILY} --cst ${BOARD}.cst
 
 # Generate Bitstream
-uart.fs: uart_pnr.json
-	gowin_pack -d ${FAMILY} -o uart.fs uart_pnr.json
+top.fs: top_pnr.json
+	gowin_pack -d ${FAMILY} -o top.fs top_pnr.json
 
 # Program Board
-load: uart.fs
-	openFPGALoader -b ${BOARD} uart.fs -f
+load: top.fs
+	openFPGALoader -b ${BOARD} top.fs -f
 
 .PHONY: load
-.INTERMEDIATE: uart_pnr.json uart.json
+.INTERMEDIATE: top_pnr.json top.json
