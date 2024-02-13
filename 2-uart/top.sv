@@ -7,7 +7,7 @@ module top
     input clk,
     input uart_rx,
     output uart_tx,
-    output [5:0] led,
+    output [5:0] led
 );
 
 localparam CLK_SPEED = 27000000; // 27MHz

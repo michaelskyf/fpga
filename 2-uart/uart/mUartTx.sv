@@ -1,7 +1,7 @@
 module mUartTx
 #(
     parameter CLOCK_SPEED,
-    parameter BAUD_RATE,
+    parameter BAUD_RATE
 )
 (
     input wire clock,
@@ -10,20 +10,19 @@ module mUartTx
     output reg complete = 1,
     input wire send,
 
-    input wire [7:0] dataIn,
+    input wire [7:0] dataIn
 );
 
 localparam CLOCK_DELAY = CLOCK_SPEED / BAUD_RATE;
 
 typedef enum {
     TX_STATE_IDLE,
-    TX_STATE_DATA,
-    TX_STATE_END
+    TX_STATE_DATA
 } eTxState;
 
-reg [31:0] clockCounter;
+reg [31:0] clockCounter = 1;
 eTxState txState = TX_STATE_IDLE;
-reg [7:0] txCounter;
+reg [7:0] txCounter = 0;
 
 reg [7:0] inputBuf;
 reg [7:0] txBuf;
@@ -44,14 +43,11 @@ task handleTx();
                     txCounter <= txCounter + 1;
                     uart_tx <= txBuf[txCounter];
                 end else begin
-                    txState <= TX_STATE_END;
+                    txState <= TX_STATE_IDLE;
                     uart_tx <= 1;
                     complete <= 1;
                     txCounter <= 0;
                 end
-            end
-            TX_STATE_END: begin // Stop bit
-                txState <= TX_STATE_IDLE;
             end
         endcase
     end
@@ -65,9 +61,9 @@ begin
         inputBuf <= dataIn;
     end
     clockCounter <= clockCounter + 1;
-    if(clockCounter == CLOCK_DELAY || txState == TX_STATE_IDLE)
+    if(clockCounter == CLOCK_DELAY)
     begin
-        clockCounter <= 0;
+        clockCounter <= 1;
 
         handleTx();
 
